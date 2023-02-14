@@ -26,7 +26,7 @@ func main() {
 }
 
 // HandleLambdaEvent will respond to a CloudWatch Alarm, check for rate limited IP addresses and send a message to Slack.
-func HandleLambdaEvent(ctx context.Context, e events.SNSEntity) error {
+func HandleLambdaEvent(ctx context.Context, event events.SNSEvent) error {
 	log.Printf("Running Lambda (%s)\n", GitVersion)
 
 	config, err := util.LoadConfig(".")
@@ -39,19 +39,21 @@ func HandleLambdaEvent(ctx context.Context, e events.SNSEntity) error {
 		return fmt.Errorf("configuration error: %s", strings.Join(errs, "\n"))
 	}
 
-	log.Println("Inspecting event")
+	log.Println("Inspecting events")
 
-	var detail guardduty.EventDetail
+	for _, e := range event.Records {
+		var detail guardduty.EventDetail
 
-	if err := json.Unmarshal([]byte(e.Message), &detail); err != nil {
-		return fmt.Errorf("failed to unmarshal event: %w", err)
-	}
+		if err := json.Unmarshal([]byte(e.SNS.Message), &detail); err != nil {
+			return fmt.Errorf("failed to unmarshal event: %w", err)
+		}
 
-	log.Println("Sending Slack message")
+		log.Println("Sending Slack message for finding ID:", detail.ID)
 
-	err = slack.PostMessage(config, detail)
-	if err != nil {
-		return fmt.Errorf("failed to post Slack message: %w", err)
+		err = slack.PostMessage(config, detail)
+		if err != nil {
+			return fmt.Errorf("failed to post Slack message: %w", err)
+		}
 	}
 
 	log.Println("Function complete")
