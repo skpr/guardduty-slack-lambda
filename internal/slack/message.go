@@ -13,7 +13,7 @@ import (
 )
 
 // PostMessage to Slack channel.
-func PostMessage(config util.Config, event guardduty.EventDetail) error {
+func PostMessage(config util.Config, detail guardduty.EventDetail) error {
 	message := Message{
 		Blocks: []Block{
 			{
@@ -32,15 +32,15 @@ func PostMessage(config util.Config, event guardduty.EventDetail) error {
 					},
 					{
 						Type: BlockElementTypeMarkdown,
-						Text: aws.String(fmt.Sprintf("*Severity* = %s", event.Detail.Severity)),
+						Text: aws.String(fmt.Sprintf("*Severity* = %s", detail.Severity)),
 					},
 					{
 						Type: BlockElementTypeMarkdown,
-						Text: aws.String(fmt.Sprintf("*ID* = %s", event.Detail.ID)),
+						Text: aws.String(fmt.Sprintf("*ID* = %s", detail.ID)),
 					},
 					{
 						Type: BlockElementTypeMarkdown,
-						Text: aws.String(fmt.Sprintf("*Type* = %s", event.Detail.Type)),
+						Text: aws.String(fmt.Sprintf("*Type* = %s", detail.Type)),
 					},
 				},
 			},
@@ -48,7 +48,7 @@ func PostMessage(config util.Config, event guardduty.EventDetail) error {
 				Type: BlockTypeSection,
 				Text: &BlockText{
 					Type: BlockTextTypeMarkdown,
-					Text: event.Detail.Description,
+					Text: detail.Description,
 				},
 			},
 		},
