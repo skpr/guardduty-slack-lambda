@@ -13,7 +13,7 @@ import (
 )
 
 // PostMessage to Slack channel.
-func PostMessage(config util.Config, event guardduty.Event) error {
+func PostMessage(config util.Config, event guardduty.EventDetail) error {
 	message := Message{
 		Blocks: []Block{
 			{
