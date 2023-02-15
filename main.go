@@ -1,13 +1,10 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/skpr/guardduty-slack-lambda/internal/guardduty"
@@ -26,7 +23,7 @@ func main() {
 }
 
 // HandleLambdaEvent will respond to a CloudWatch Alarm, check for rate limited IP addresses and send a message to Slack.
-func HandleLambdaEvent(ctx context.Context, event events.SNSEvent) error {
+func HandleLambdaEvent(event guardduty.Event) error {
 	log.Printf("Running Lambda (%s)\n", GitVersion)
 
 	config, err := util.LoadConfig(".")
@@ -39,21 +36,11 @@ func HandleLambdaEvent(ctx context.Context, event events.SNSEvent) error {
 		return fmt.Errorf("configuration error: %s", strings.Join(errs, "\n"))
 	}
 
-	log.Println("Inspecting events")
+	log.Println("Sending Slack message for finding ID:", event.Detail.ID)
 
-	for _, e := range event.Records {
-		var detail guardduty.EventDetail
-
-		if err := json.Unmarshal([]byte(e.SNS.Message), &detail); err != nil {
-			return fmt.Errorf("failed to unmarshal event: %w", err)
-		}
-
-		log.Println("Sending Slack message for finding ID:", detail.ID)
-
-		err = slack.PostMessage(config, detail)
-		if err != nil {
-			return fmt.Errorf("failed to post Slack message: %w", err)
-		}
+	err = slack.PostMessage(config, event.Detail)
+	if err != nil {
+		return fmt.Errorf("failed to post Slack message: %w", err)
 	}
 
 	log.Println("Function complete")
