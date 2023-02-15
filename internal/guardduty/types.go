@@ -5,7 +5,7 @@ type Event struct {
 }
 
 type EventDetail struct {
-	Severity    string `json:"severity"`
+	Severity    int    `json:"severity"`
 	ID          string `json:"id"`
 	Type        string `json:"type"`
 	Description string `json:"description"`

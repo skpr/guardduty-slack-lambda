@@ -32,7 +32,7 @@ func PostMessage(config util.Config, detail guardduty.EventDetail) error {
 					},
 					{
 						Type: BlockElementTypeMarkdown,
-						Text: aws.String(fmt.Sprintf("*Severity* = %s", detail.Severity)),
+						Text: aws.String(fmt.Sprintf("*Severity* = %d", detail.Severity)),
 					},
 					{
 						Type: BlockElementTypeMarkdown,
