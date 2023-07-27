@@ -20,7 +20,7 @@ func PostMessage(config util.Config, detail guardduty.EventDetail) error {
 				Type: BlockTypeHeader,
 				Text: &BlockText{
 					Type: BlockTextTypePlainText,
-					Text: ":shield: GuardDuty Finding :shield:",
+					Text: ":guardduty: GuardDuty Finding",
 				},
 			},
 			{
